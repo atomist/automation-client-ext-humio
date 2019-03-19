@@ -241,37 +241,36 @@ class HumioTransport extends TransportStream {
         );
     }
 
-    public log(info: any, mext: any): void {
-        setImmediate(() => {
-            let msg = info.message;
-            const level = info.level;
+    public log(info: any, next: any): void {
 
-            if (typeof msg !== "string" && typeof msg !== "object") {
-                msg = { message: stringify(msg) };
-            } else if (typeof msg === "string") {
-                msg = { message: msg };
-            }
+        let msg = info.message;
+        const level = info.level;
 
-            if (nsp && nsp.get()) {
-                _.assign(msg, {
-                    level,
-                    "operation": nsp.get().operation,
-                    "registration": nsp.get().name,
-                    "version": nsp.get().version,
-                    "workspace-id": nsp.get().workspaceId,
-                    "workspace-name": nsp.get().workspaceName,
-                    "correlation-id": nsp.get().correlationId,
-                    "invocation-id": nsp.get().invocationId,
-                });
-            } else {
-                _.assign(msg, {
-                    level,
-                });
-            }
+        if (typeof msg !== "string" && typeof msg !== "object") {
+            msg = { message: stringify(msg) };
+        } else if (typeof msg === "string") {
+            msg = { message: msg };
+        }
 
-            this.humio.sendJson(msg);
-        });
+        if (!!nsp && !!nsp.get()) {
+            _.assign(msg, {
+                level,
+                "operation": nsp.get().operation,
+                "registration": nsp.get().name,
+                "version": nsp.get().version,
+                "workspace-id": nsp.get().workspaceId,
+                "workspace-name": nsp.get().workspaceName,
+                "correlation-id": nsp.get().correlationId,
+                "invocation-id": nsp.get().invocationId,
+            });
+        } else {
+            _.assign(msg, {
+                level,
+            });
+        }
 
-        mext();
+        this.humio.sendJson(msg);
+
+        next();
     }
 }
