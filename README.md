@@ -1,26 +1,26 @@
-# @atomist/automation-client-ext-logzio
+# @atomist/automation-client-ext-humio
 
-[![atomist sdm goals](http://badge.atomist.com/T29E48P34/atomist/automation-client-ext-logzio/d6848374-7a8b-429a-a670-72c7c20c33f7)](https://app.atomist.com/workspace/T29E48P34)
-[![npm version](https://img.shields.io/npm/v/@atomist/automation-client-ext-logzio.svg)](https://www.npmjs.com/package/@atomist/automation-client-ext-logzio)
+[![atomist sdm goals](https://badge.atomist.com/T29E48P34/atomist/automation-client-ext-humio/88145d69-e4ac-4517-8ccd-faf3d1f46f6a)](https://app.atomist.com/workspace/T29E48P34)
+[![npm version](https://img.shields.io/npm/v/@atomist/automation-client-ext-humio.svg)](https://www.npmjs.com/package/@atomist/automation-client-ext-humio)
 
-An extension to an Atomist automation-client to send logs to Logz.io.
+An extension to an Atomist automation-client to send logs to Humio.
 
 ## Usage
 
 1. First install the dependency in your automation-client project
 
 ```
-$ npm install @atomist/automation-client-ext-logzio
+$ npm install @atomist/automation-client-ext-humio
 ```
 
-2. Install the support in your `atomist.config.ts`
+2. Install the support in your `index.ts`
 
 ```
-import { configureLogzio } from "@atomist/automation-client-ext-logzio";
+import { configureHumio } from "@atomist/automation-client-ext-humio";
 
 export const configuration: Configuration = {
     postProcessors: [
-            configureLogzio,
+            configureHumio,
     ],
 }
 ```
@@ -28,9 +28,10 @@ export const configuration: Configuration = {
 3. Add configuration to your client configuration
 
 ```
-  "logzio": {
+  "humio": {
     "enabled": true,
-    "token": "<your token>"
+    "token": "<your ingester token>",
+    "repository": "<name of the humio repository>",
   }
 ```
 
@@ -41,7 +42,7 @@ channel in the [Atomist community Slack workspace][slack].
 
 If you find a problem, please create an [issue][].
 
-[issue]: https://github.com/atomist/automation-client-ext-logzio/issues
+[issue]: https://github.com/atomist/automation-client-ext-humio/issues
 
 ## Development
 
