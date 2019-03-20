@@ -174,7 +174,7 @@ export class HumioAutomationEventListener extends AutomationEventListenerSupport
             "correlation-id": ctx.correlationId,
             "invocation-id": ctx.invocationId,
             "message": `${identifier} of ${ctx.operation} for ${ctx.workspaceName} '${ctx.workspaceId}'`,
-            "payload": JSON.stringify(payload),
+            payload,
         };
         if (!!this.humio) {
             this.humio.sendJson(data);
