@@ -29,6 +29,10 @@ import {
     MessageOptions,
 } from "@atomist/automation-client";
 import * as nsp from "@atomist/automation-client/lib/internal/util/cls";
+import {
+    redact as redactString,
+    redactLog,
+} from "@atomist/automation-client/lib/util/redact";
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as os from "os";
@@ -46,7 +50,7 @@ export interface HumioOptions {
 export class HumioAutomationEventListener extends AutomationEventListenerSupport
     implements AutomationEventListener {
 
-    constructor(private readonly humio: any) {
+    constructor(private readonly humio: any, private readonly redact: boolean) {
         super();
     }
 
@@ -174,7 +178,7 @@ export class HumioAutomationEventListener extends AutomationEventListenerSupport
             "correlation-id": ctx.correlationId,
             "invocation-id": ctx.invocationId,
             "message": `${identifier} of ${ctx.operation} for ${ctx.workspaceName} '${ctx.workspaceId}'`,
-            "payload": JSON.stringify(payload),
+            "payload": this.redact ? redactString(JSON.stringify(payload)) : JSON.stringify(payload),
         };
         if (!!this.humio) {
             this.humio.sendJson(data);
@@ -199,6 +203,8 @@ export async function configureHumio(configuration: Configuration): Promise<Conf
             throw new Error("Humio can't be loaded. Please install with 'npm install humio --save'.");
         }
 
+        const redact = _.get(configuration, "redact.log", true);
+
         const options = {
             ingestToken: configuration.humio.token,
             host: "cloud.humio.com",
@@ -219,11 +225,11 @@ export async function configureHumio(configuration: Configuration): Promise<Conf
         const Humio = require("humio");
         const humio = new Humio(options);
 
-        configuration.listeners.push(new HumioAutomationEventListener(humio));
+        configuration.listeners.push(new HumioAutomationEventListener(humio, redact));
 
         _.update(configuration, "logging.custom.transports",
             old => !!old ? old : []);
-        configuration.logging.custom.transports.push(new HumioTransport({ humio }));
+        configuration.logging.custom.transports.push(new HumioTransport({ humio }, redact));
     }
     return configuration;
 }
@@ -232,10 +238,11 @@ class HumioTransport extends TransportStream {
 
     private readonly humio: any;
 
-    constructor(opts: any) {
+    constructor(opts: any, redact: boolean) {
         super(opts);
         this.humio = opts.humio;
         this.format = winston.format.combine(
+            ...(redact ? [winston.format(redactLog)()] : []),
             winston.format.splat(),
             winston.format.printf(info => info.message),
         );
