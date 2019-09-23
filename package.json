@@ -26,13 +26,13 @@
   "types": "./index.d.ts",
   "dependencies": {
     "@types/app-root-path": "^1.2.4",
-    "@types/lodash": "^4.14.136",
+    "@types/lodash": "^4.14.139",
     "@types/serialize-error": "^4.0.1",
     "app-root-path": "^2.2.1",
     "humio": "^0.4.0-beta2",
     "json-stringify-safe": "^5.0.1",
-    "lodash": "^4.17.13",
-    "serialize-error": "^4.1.0",
+    "lodash": "^4.17.15",
+    "serialize-error": "^5.0.0",
     "winston": "^3.2.1",
     "winston-transport": "^4.3.0"
   },
