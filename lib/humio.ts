@@ -29,6 +29,7 @@ import {
     MessageOptions,
 } from "@atomist/automation-client";
 import * as nsp from "@atomist/automation-client/lib/internal/util/cls";
+import { replacer } from "@atomist/automation-client/lib/internal/util/string";
 import {
     redact as redactString,
     redactLog,
@@ -178,7 +179,7 @@ export class HumioAutomationEventListener extends AutomationEventListenerSupport
             "correlation-id": ctx.correlationId,
             "invocation-id": ctx.invocationId,
             "message": `${identifier} of ${ctx.operation} for ${ctx.workspaceName} '${ctx.workspaceId}'`,
-            "payload": this.redact ? redactString(JSON.stringify(payload)) : JSON.stringify(payload),
+            "payload": this.redact ? redactString(stringify(payload, replacer)) : stringify(payload, replacer),
         };
         if (!!this.humio) {
             this.humio.sendJson(data);
