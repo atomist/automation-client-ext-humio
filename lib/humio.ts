@@ -36,7 +36,7 @@ import {
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as os from "os";
-import * as serializeError from "serialize-error";
+import { serializeError } from "serialize-error";
 import * as winston from "winston";
 import * as TransportStream from "winston-transport";
 
