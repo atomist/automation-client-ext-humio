@@ -14,22 +14,27 @@
  * limitations under the License.
  */
 
+import { Configuration } from "@atomist/automation-client/lib/configuration";
+import { EventFired } from "@atomist/automation-client/lib/HandleEvent";
 import {
     AutomationContextAware,
+    HandlerContext,
+} from "@atomist/automation-client/lib/HandlerContext";
+import { HandlerResult } from "@atomist/automation-client/lib/HandlerResult";
+import { CommandInvocation } from "@atomist/automation-client/lib/internal/invoker/Payload";
+import {
+    CommandIncoming,
+    EventIncoming,
+} from "@atomist/automation-client/lib/internal/transport/RequestProcessor";
+import * as nsp from "@atomist/automation-client/lib/internal/util/cls";
+import {
     AutomationEventListener,
     AutomationEventListenerSupport,
-    CommandIncoming,
-    CommandInvocation,
-    Configuration,
+} from "@atomist/automation-client/lib/server/AutomationEventListener";
+import {
     Destination,
-    EventFired,
-    EventIncoming,
-    HandlerContext,
-    HandlerResult,
     MessageOptions,
-} from "@atomist/automation-client";
-import * as nsp from "@atomist/automation-client/lib/internal/util/cls";
-import { replacer } from "@atomist/automation-client/lib/internal/util/string";
+} from "@atomist/automation-client/lib/spi/message/MessageClient";
 import {
     redact as redactString,
     redactLog,
@@ -37,7 +42,7 @@ import {
 import * as stringify from "json-stringify-safe";
 import * as _ from "lodash";
 import * as os from "os";
-import { serializeError } from "serialize-error";
+import * as serializeError from "serialize-error";
 import * as winston from "winston";
 import * as TransportStream from "winston-transport";
 
@@ -179,7 +184,7 @@ export class HumioAutomationEventListener extends AutomationEventListenerSupport
             "correlation-id": ctx.correlationId,
             "invocation-id": ctx.invocationId,
             "message": `${identifier} of ${ctx.operation} for ${ctx.workspaceName} '${ctx.workspaceId}'`,
-            "payload": this.redact ? redactString(stringify(payload, replacer)) : stringify(payload, replacer),
+            "payload": this.redact ? redactString(JSON.stringify(payload)) : JSON.stringify(payload),
         };
         if (!!this.humio) {
             this.humio.sendJson(data);
